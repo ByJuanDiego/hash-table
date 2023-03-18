@@ -93,25 +93,32 @@ std::string sha256(const std::string &str) {
     return ss.str();
 }
 ```
-> As we can see, sha256 can only recieve a ```std::string``` and return another ```std::string```, this will be important later
 
-And the hash function interface to be used in the instanciation
+> As we can see, ```sha256``` function can only recieve a ```std::string``` and return another ```std::string```, this will be important later.
+> Just for usage cases, lets reduce the return value to just take the first ```N``` digits
+> ```c++
+> #define SHA256_SIZE 10
+> return ss.str().substr(0, SHA256_SIZE);
+> ```
+
+And the hash function structure to be used in the instantiation
 ```c++
 template<typename KT>
 struct hash_sha256 {
-    unsigned long operator()(const KT &key) {
-        std::hash<KT> h;
-        return h(sha256(key));
+    size_t operator()(const KT &key) {
+        KT hex_hash = sha256(key);
+        return std::stoull(hex_hash, nullptr, 16);
     }
 };
+
 ```
-If ```key_type``` is not an ```std::string```, is required a template specialization for ```key_type``` in order to guarantee that sha256 is recieving a ```std::string```. An usage example is:
+If ```KT``` is not an ```std::string```, is required a template specialization for ```key_type``` in order to guarantee that ```sha256``` is recieving a ```std::string```. An usage example is:
 ```c++
 template<>
 struct hash_sha256<non_string_type> {
-    unsigned long operator()(const non_string_type &key) {
-        std::hash<std::string> h;
-        return h(sha256(key.string_format()));
+    size_t operator()(const non_string_type &key) {
+        hash_sha256<std::string> hash;
+        return hash(key.string_format());
     }
 };
 ```
