@@ -40,7 +40,7 @@ std::hash<non_trivial_type> {
     }
 }
 ```
-> A second option is to create a member function at ```non_trivial_type``` definition in order to return ```hash(k.string_format())``` instead of the ```hash``` applied to a especific member variable.
+> A second option is to create a member function at ```non_trivial_type``` definition in order to return ```hash(k.string_format())``` instead of the ```hash``` applied to a especific member variable. For more information, visit [cppreference/hash](https://en.cppreference.com/w/cpp/utility/hash)
 
 
 ```c++
@@ -59,4 +59,65 @@ std::equals_to<non_trivial_type> {
 Once finished the template specialization the ```hash_table``` instance should work properly.
 
 ## Third party hash functions
-In the examples shown above both has ```std::hash``` as hash function. As ```Hash``` is a type template parameter, it means that ```std::hash``` is not the unique hash function that can be used.
+In the examples shown above both ```KT``` has ```std::hash``` as hash function. As ```Hash``` is a type template parameter, it means that ```std::hash``` is not the unique hash function that can be used. For example, another hash function is ```SHA256```, popular by being one of the most secure hash algorithm used by some of the most secure networks in the world. ```OpenSSL``` is one of the third party libraries that provides this algorithm.
+
+To install OpenSSL in Fedora Linux 37
+```
+sudo yum install openssl
+sudo yum install openssl-devel
+```
+
+To link the library with the project add the following lines to the ```CMakeList.txt``` file
+```cmake
+find_package(OpenSSL REQUIRED)
+target_link_libraries(${PROJECT_NAME} OpenSSL::SSL)
+```
+
+```SHA256``` algorithm would look like this:
+```c++
+#include <openssl/sha.h>
+#include <functional>
+#include <iomanip>
+#include <string>
+
+std::string sha256(const std::string &str) {
+    unsigned char hash[SHA256_DIGEST_LENGTH];
+    SHA256_CTX sha256;
+    SHA256_Init(&sha256);
+    SHA256_Update(&sha256, str.c_str(), str.size());
+    SHA256_Final(hash, &sha256);
+    std::stringstream ss;
+    for (unsigned char i: hash) {
+        ss << std::hex << std::setw(2) << std::setfill('0') << (int) i;
+    }
+    return ss.str();
+}
+```
+> As we can see, sha256 can only recieve a ```std::string``` and return another ```std::string```, this will be important later
+
+And the hash function interface to be used in the instanciation
+```c++
+template<typename KT>
+struct hash_sha256 {
+    unsigned long operator()(const KT &key) {
+        std::hash<KT> h;
+        return h(sha256(key));
+    }
+};
+```
+If ```key_type``` is not an ```std::string```, is required a template specialization for ```key_type``` in order to guarantee that sha256 is recieving a ```std::string```. An usage example is:
+```c++
+template<>
+struct hash_sha256<non_string_type> {
+    unsigned long operator()(const non_string_type &key) {
+        std::hash<std::string> h;
+        return h(sha256(key.string_format()));
+    }
+};
+```
+
+Finally, all the ingredients are ready to create a new ```hash_table```:
+```c++
+hash_table<key_type, any_value_type, hash_sha256<key_type>> hashTable;
+```
+> do not forget to define ```std::equal<key_type>``` if needed, independant of the hash function
