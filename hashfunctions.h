@@ -10,6 +10,8 @@
 #include <iomanip>
 #include <string>
 
+#define SHA256_SIZE 10
+
 std::string sha256(const std::string &str) {
     unsigned char hash[SHA256_DIGEST_LENGTH];
     SHA256_CTX sha256;
@@ -20,14 +22,14 @@ std::string sha256(const std::string &str) {
     for (unsigned char i: hash) {
         ss << std::hex << std::setw(2) << std::setfill('0') << (int) i;
     }
-    return ss.str();
+    return ss.str().substr(0, SHA256_SIZE);
 }
 
 template<typename KT>
 struct hash_sha256 {
-    unsigned long operator()(const KT &key) {
-        std::hash<KT> h;
-        return h(sha256(key));
+    size_t operator()(const KT &key) {
+        std::string hex_hash = sha256(key);
+        return std::stoull(hex_hash, nullptr, 16);
     }
 };
 

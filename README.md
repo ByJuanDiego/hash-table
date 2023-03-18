@@ -58,7 +58,7 @@ std::equals_to<non_trivial_type> {
 
 Once finished the template specialization the ```hash_table``` instance should work properly.
 
-## Third party hash functions
+## Third party hash functions (optional)
 In the examples shown above both ```KT``` has ```std::hash``` as hash function. As ```Hash``` is a type template parameter, it means that ```std::hash``` is not the unique hash function that can be used. For example, another hash function is ```SHA256```, popular by being one of the most secure hash algorithm used by some of the most secure networks in the world. ```OpenSSL``` is one of the third party libraries that provides this algorithm.
 
 To install OpenSSL in Fedora Linux 37

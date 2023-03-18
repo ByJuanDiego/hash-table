@@ -24,15 +24,15 @@ struct transaction {
 
 template<>
 struct hash_sha256<transaction> {
-    unsigned long operator()(const transaction &transaction) {
-        std::hash<std::string> h;
-        return h(sha256(transaction.to_string()));
+    size_t operator()(const transaction &transaction) {
+        hash_sha256<std::string> h;
+        return h(transaction.to_string());
     }
 };
 
 template<>
 struct std::hash<transaction> {
-    unsigned long operator()(const transaction &transaction) {
+    size_t operator()(const transaction &transaction) {
         std::hash<std::string> h;
         return h(transaction.to_string());
     }

@@ -17,11 +17,11 @@ class hash_table {
 private:
 
     struct entry {
-        unsigned long hash_code;
+        size_t hash_code;
         KT key;
         KV value;
 
-        explicit entry(unsigned long hash_code, KT key, KV value) : hash_code(hash_code), key(key), value(value) {}
+        explicit entry(size_t hash_code, KT key, KV value) : hash_code(hash_code), key(key), value(value) {}
     };
 
     Hash hash;
@@ -80,8 +80,8 @@ public:
     }
 
     bool set(KT key, KV value) {
-        unsigned long hash_code = hash(key);
-        int i = hash_code % n_buckets;
+        size_t hash_code = hash(key);
+        int i = (hash_code % n_buckets);
         std::list<entry> &bucket = buckets[i];
 
         auto it = std::find_if(bucket.begin(), bucket.end(), [&](entry &e) { return equal(e.key, key); });
@@ -113,7 +113,7 @@ public:
     }
 
     bool remove(KT key) {
-        unsigned long hash_code = hash(key);
+        size_t hash_code = hash(key);
         int i = hash_code % n_buckets;
 
         if (buckets[i].remove_if([&](entry &e) { return equal(e.key, key); }) == 1) {
