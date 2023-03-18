@@ -12,7 +12,7 @@
 
 #define REHASING_FACTOR 2
 
-template<typename KT, typename KV, typename F = std::hash<KT>>
+template<typename KT, typename KV, typename Hash = std::hash<KT>, class KeyEqual = std::equal_to<KT>>
 class hash_table {
 private:
 
@@ -24,7 +24,8 @@ private:
         explicit entry(unsigned long hash_code, KT key, KV value) : hash_code(hash_code), key(key), value(value) {}
     };
 
-    F hash;
+    Hash hash;
+    KeyEqual equal;
     int n_buckets;
     int n_elements;
     float max_load_factor;
@@ -53,10 +54,11 @@ private:
 
 public:
 
-    explicit hash_table(int n_buckets = 5, F hash = F(), float max_load_factor = 0.5)
+    explicit hash_table(int n_buckets = 5, float max_load_factor = 0.5, Hash hash = Hash(), KeyEqual equal = KeyEqual())
             : n_buckets(n_buckets),
               n_elements(0),
               hash{hash},
+              equal{equal},
               max_load_factor(max_load_factor),
               buckets(nullptr) {
         buckets = new std::list<entry>[n_buckets];
@@ -82,7 +84,7 @@ public:
         int i = hash_code % n_buckets;
         std::list<entry> &bucket = buckets[i];
 
-        auto it = std::find_if(bucket.begin(), bucket.end(), [&](entry &e) { return e.key == key; });
+        auto it = std::find_if(bucket.begin(), bucket.end(), [&](entry &e) { return equal(e.key, key); });
         if (it != bucket.end()) {
             return false;
         }
@@ -101,7 +103,7 @@ public:
         std::list<entry> &bucket = buckets[i];
 
         for (entry &e: bucket) {
-            if (e.key != key) {
+            if (!equal(e.key, key)) {
                 continue;
             }
             return e.value;
@@ -114,7 +116,7 @@ public:
         unsigned long hash_code = hash(key);
         int i = hash_code % n_buckets;
 
-        if (buckets[i].remove_if([&](entry &e) { return e.key == key; }) == 1) {
+        if (buckets[i].remove_if([&](entry &e) { return equal(e.key, key); }) == 1) {
             --n_elements;
             return true;
         }
@@ -128,7 +130,7 @@ public:
         std::list<entry> &bucket = buckets[i];
 
         for (entry &e: bucket) {
-            if (e.key != key) {
+            if (!equal(e.key, key)) {
                 continue;
             }
             e.value = new_value;

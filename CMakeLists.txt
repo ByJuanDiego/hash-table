@@ -5,7 +5,7 @@ set(CMAKE_CXX_STANDARD 20)
 
 find_package(OpenSSL REQUIRED)
 
-add_executable(hash_table main.cpp hashtable.h)
+add_executable(hash_table main.cpp hashtable.h hashfunctions.h)
 
 target_link_libraries(
     ${PROJECT_NAME}
