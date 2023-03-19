@@ -12,16 +12,16 @@
 
 #define REHASING_FACTOR 2
 
-template<typename KT, typename KV, typename Hash = std::hash<KT>, class KeyEqual = std::equal_to<KT>>
+template<typename K, typename V, typename Hash = std::hash<K>, class KeyEqual = std::equal_to<K>>
 class hash_table {
 private:
 
-    struct entry {
+    struct node {
         size_t hash_code;
-        KT key;
-        KV value;
+        K key;
+        V value;
 
-        explicit entry(size_t hash_code, KT key, KV value) : hash_code(hash_code), key(key), value(value) {}
+        explicit node(size_t hash_code, K key, V value) : hash_code(hash_code), key(key), value(value) {}
     };
 
     Hash hash;
@@ -29,18 +29,18 @@ private:
     int n_buckets;
     int n_elements;
     float max_load_factor;
-    std::list<entry> *buckets;
+    std::list<node> *buckets;
 
     float load_factor() {
         return size() * 1.0 / bucket_count();
     }
 
     void rehashing() {
-        auto *new_buckets = new std::list<entry>[n_buckets * REHASING_FACTOR];
+        auto *new_buckets = new std::list<node>[n_buckets * REHASING_FACTOR];
         int j{};
 
         for (int i = 0; i < n_buckets; ++i) {
-            for (entry &e: buckets[i]) {
+            for (node &e: buckets[i]) {
                 j = e.hash_code % (n_buckets * REHASING_FACTOR);
                 new_buckets[j].push_front(e);
             }
@@ -61,7 +61,7 @@ public:
               equal{equal},
               max_load_factor(max_load_factor),
               buckets(nullptr) {
-        buckets = new std::list<entry>[n_buckets];
+        buckets = new std::list<node>[n_buckets];
     }
 
     ~hash_table() {
@@ -69,7 +69,7 @@ public:
         delete[] buckets;
     }
 
-    bool find(KT key) {
+    bool find(K key) {
         try {
             get(key);
         }
@@ -79,17 +79,17 @@ public:
         return true;
     }
 
-    bool set(KT key, KV value) {
+    bool set(K key, V value) {
         size_t hash_code = hash(key);
         int i = (hash_code % n_buckets);
-        std::list<entry> &bucket = buckets[i];
+        std::list<node> &bucket = buckets[i];
 
-        auto it = std::find_if(bucket.begin(), bucket.end(), [&](entry &e) { return equal(e.key, key); });
+        auto it = std::find_if(bucket.begin(), bucket.end(), [&](node &e) { return equal(e.key, key); });
         if (it != bucket.end()) {
             return false;
         }
 
-        bucket.push_front(entry(hash_code, key, value));
+        bucket.push_front(node(hash_code, key, value));
         ++n_elements;
         if (load_factor() >= max_load_factor) {
             rehashing();
@@ -97,12 +97,12 @@ public:
         return true;
     }
 
-    KV &get(KT key) {
+    V &get(K key) {
         unsigned long hash_code = hash(key);
         int i = hash_code % n_buckets;
-        std::list<entry> &bucket = buckets[i];
+        std::list<node> &bucket = buckets[i];
 
-        for (entry &e: bucket) {
+        for (node &e: bucket) {
             if (!equal(e.key, key)) {
                 continue;
             }
@@ -112,11 +112,11 @@ public:
         throw std::runtime_error("The key you are looking for do not exists");
     }
 
-    bool remove(KT key) {
+    bool remove(K key) {
         size_t hash_code = hash(key);
         int i = hash_code % n_buckets;
 
-        if (buckets[i].remove_if([&](entry &e) { return equal(e.key, key); }) == 1) {
+        if (buckets[i].remove_if([&](node &e) { return equal(e.key, key); }) == 1) {
             --n_elements;
             return true;
         }
@@ -124,12 +124,12 @@ public:
         return false;
     }
 
-    bool update(KT key, KV new_value) {
+    bool update(K key, V new_value) {
         unsigned long hash_code = hash(key);
         int i = hash_code % n_buckets;
-        std::list<entry> &bucket = buckets[i];
+        std::list<node> &bucket = buckets[i];
 
-        for (entry &e: bucket) {
+        for (node &e: bucket) {
             if (!equal(e.key, key)) {
                 continue;
             }
@@ -160,7 +160,7 @@ public:
     void print(std::ostream &os) {
         for (int i = 0; i < bucket_count(); ++i) {
             os << "[" << i << "] => ";
-            for (entry &e: buckets[i]) {
+            for (node &e: buckets[i]) {
                 os << "{" << e.key << ":" << e.value << "}" << " -> ";
             }
             os << std::endl;

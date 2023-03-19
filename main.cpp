@@ -5,19 +5,19 @@
 struct transaction {
     std::string emisor;
     std::string receptor;
-    double ammount;
+    double amount;
 
-    explicit transaction(std::string emisor, std::string receptor, double ammount) :
-            emisor(std::move(emisor)), receptor(std::move(receptor)), ammount(ammount) {}
+    explicit transaction(std::string emisor, std::string receptor, double amount) :
+            emisor(std::move(emisor)), receptor(std::move(receptor)), amount(amount) {}
 
     [[nodiscard]] std::string to_string() const {
         std::stringstream ss;
-        ss << emisor << receptor << ammount;
+        ss << emisor << receptor << amount;
         return ss.str();
     }
 
     friend std::ostream &operator<<(std::ostream &os, transaction &transaction) {
-        os << "(" << transaction.emisor << "," << transaction.receptor << "," << transaction.ammount << ")";
+        os << "(" << transaction.emisor << "," << transaction.receptor << "," << transaction.amount << ")";
         return os;
     }
 };
@@ -42,7 +42,7 @@ template<>
 struct std::equal_to<transaction> {
     bool operator()(const transaction &u, const transaction &v) {
         std::equal_to<> equal;
-        return equal(u.ammount, v.ammount) && equal(u.emisor, v.emisor) && equal(u.receptor, v.receptor);
+        return equal(u.amount, v.amount) && equal(u.emisor, v.emisor) && equal(u.receptor, v.receptor);
     }
 };
 
