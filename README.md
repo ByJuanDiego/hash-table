@@ -34,7 +34,7 @@ class hash_table;
     // specialization for std::hash
     template<>
     std::hash<non_trivial_type> {
-        unsigned long operator() (const non_trivial_type& k) {
+        size_t operator() (const non_trivial_type& k) {
             std::hash<basic_type> hash;
             return hash(k.basic_type_member_variable);
         }
