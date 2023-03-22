@@ -85,7 +85,7 @@ class hash_table
 - ```Index```: function type used to obtain the index of a ```value```
 - ```Equal```: function type used to define when two ```keys``` are equal
 - ```RehashingFactor```: ```integer``` that defines
-  the ```table size multiplier``` when [```rehashing```](https://www.codingninjas.com/codestudio/library/load-factor-and-rehashing) occurs
+  the ```table size multiplier``` when [rehashing](https://www.codingninjas.com/codestudio/library/load-factor-and-rehashing) occurs
 
 ## Member variables
 
@@ -136,22 +136,26 @@ $v_{avg} :=$ **average** number of ```values``` on an ```entry```
 ## Initialization
 
 ```c++
-sha2::sha256<std::string> hash;
+using std::string;
+using sha = sha2::sha256<string>;
+using index_t = std::function<string(transaction *)>;
+using equal_t = std::function<bool(string, string)>;
 
-std::function<std::string(transaction *)> index = [&](const transaction *tx) -> std::string {
+sha hash;
+index_t index = [&](const transaction *tx) -> string {
     return tx->emisor;
 };
-
-std::function<bool(std::string, std::string)> equal = [&](const std::string& a, const std::string& b) -> bool {
+equal_t equal = [&](const string &a, const string &b) -> bool {
     return (a == b);
 };
-
-hash_table<std::string, transaction *, decltype(hash), decltype(index), decltype(equal)> hashTable(index, hash, equal);
+hash_table<string, transaction *, sha, index_t, equal_t> hashTable(index, hash, equal);
 ```
+
 Instantiates a ```hashTable``` that contains ```transaction *``` indexed by ```emisor```
 
 - ```equal``` is an optional parameter. By default, it receives an instance of ```std::equal_to```, which works properly for built-in types. Using a non-built-int type as ```key``` makes necessary ```equal``` parameter or an [```std::equal_to``` specialization](https://en.cppreference.com/w/cpp/utility/functional/equal_to)
-- ```hash``` it receives an instance of ```sha2::sha256```, which is well-defined for [```std::to_string``` convertable](https://en.cppreference.com/w/cpp/string/basic_string/to_string) key-types and specialized for ```std::string``` usage. To use other key-types a ```sha2::sha256``` specialization is required 
+- ```hash``` is an instance of ```sha2::sha256```, which is well-defined for [```std::to_string``` convertable](https://en.cppreference.com/w/cpp/string/basic_string/to_string) key-types and specialized for ```std::string``` usage. To use other key-types a ```sha2::sha256``` specialization is required 
+- usage of other hash functions such as [```std::hash```](https://en.cppreference.com/w/cpp/utility/hash) is allowed by passing the desire hash function as template type parameter
 
 ## Querying
 ```c++
@@ -175,3 +179,4 @@ for (transaction *tx: txs_destructor) {
 # To be implemented
 
 - ```iterator``` class for the hash table
+- ```shrink_to_fit``` private member function to be used to resize the hash table when deleting a certain number of keys
