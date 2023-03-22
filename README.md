@@ -1,7 +1,7 @@
 # Hash table C++ implementation
 
 <p align="center">
-  <img height="370" src="./images/hashtable.png" width="370"/>
+  <img height="370" src="assets/images/hashtable.png" width="370"/>
 </p>
 
 ## Requirements
@@ -52,6 +52,7 @@ replace ```<build-dir-name>``` with the desire build directory name
 
 ```c++
 #define MINIMUM_REHASHING_FACTOR 2
+#define MAXIMUM_REHASHING_FACTOR 5
 #define DEFAULT_N_BUCKETS 11
 #define DEFAULT_MAX_LOAD_FACTOR 0.75f
 ```
@@ -59,11 +60,9 @@ replace ```<build-dir-name>``` with the desire build directory name
 ## Constraints
 
 ```c++
-template<int RehashingFactor>
-concept RehashingFactorConstraint = RehashingFactor >= MINIMUM_REHASHING_FACTOR;
+template<uint8 N>
+concept Constraint = (N >= MINIMUM_REHASHING_FACTOR && N <= MAXIMUM_REHASHING_FACTOR);
 ```
-
-```RehashingFactorConstraint```: Makes sure that ```RehashingFactor``` $\geq 2$
 
 ## Template parameters
 
@@ -74,8 +73,8 @@ template<
         typename Hash = std::hash<K>,
         typename Index = std::function<K(V)>,
         typename Equal = std::equal_to<K>,
-        int RehashingFactor = MINIMUM_REHASHING_FACTOR
-> requires RehashingFactorConstraint<RehashingFactor>
+        uint8 RehashingFactor = MINIMUM_REHASHING_FACTOR
+> requires Constraint<RehashingFactor>
 class hash_table
 ```
 
@@ -84,7 +83,7 @@ class hash_table
 - ```Hash```: function type used to obtain a ```hash_code``` from a determined ```key```
 - ```Index```: function type used to obtain the index of a ```value```
 - ```Equal```: function type used to define when two ```keys``` are equal
-- ```RehashingFactor```: ```integer``` that defines
+- ```RehashingFactor```: ```8-bits integer``` that defines
   the ```table size multiplier``` when [rehashing](https://www.codingninjas.com/codestudio/library/load-factor-and-rehashing) occurs
 
 ## Member variables

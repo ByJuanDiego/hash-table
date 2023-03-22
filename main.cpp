@@ -1,8 +1,8 @@
 #include <iostream>
 #include <fstream>
 
-#include "hashfunctions.hpp"
-#include "hashtable.cpp"
+#include "utils/hashfunctions.hpp"
+#include "include/hashtable.hpp"
 
 struct transaction {
     std::string emisor;

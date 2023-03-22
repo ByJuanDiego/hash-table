@@ -2,12 +2,12 @@ cmake_minimum_required(VERSION 3.24)
 project(hash_table)
 
 set(CMAKE_CXX_STANDARD 20)
-configure_file(${CMAKE_CURRENT_SOURCE_DIR}/transactions.txt ${CMAKE_CURRENT_BINARY_DIR} COPYONLY)
+configure_file(assets/transactions.txt ${CMAKE_CURRENT_BINARY_DIR} COPYONLY)
 
 find_package(OpenSSL REQUIRED)
 find_package(Boost REQUIRED)
 
-add_executable(hash_table main.cpp hashtable.hpp hashfunctions.hpp hashtable.cpp)
+add_executable(hash_table main.cpp include/hashtable.hpp utils/hashfunctions.hpp)
 
 target_link_libraries(
         ${PROJECT_NAME}
