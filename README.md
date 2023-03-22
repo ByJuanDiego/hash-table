@@ -1,128 +1,135 @@
 # Hash table C++ implementation
 
-## Hash table template parameters 
+![](./images/hashtable.png)
 
-```c++
-template<typename K, typename V, typename Hash = std::hash<K>, class KeyEqual = std::equal_to<K>>
-class hash_table;
-```
+## Requirements
 
-- ```K```: key type of the hash table
-- ```V```: key valuy of the hash table
-- ```Hash```: is a function type that overloads ```() operator``` to recieve a key and returns a ```size_t``` which is the key hash
-- ```KeyEqual```: is a function type that overloads ```() operator``` to define when two keys have the same value
+To run the project, install the following libraries:
 
-### Usage cases
+- [```OpenSSL```](https://www.openssl.org/): to generate [```sha256```](https://en.wikipedia.org/wiki/SHA-2)
 
-1. Using the ```hash_table``` with key types provided with template specializations (such as ```int```, ```long```, ```unsigned```, ```std::string```, etc)
- 
-    ```c++
-    hash_table<basic_type, any_value_type> hashTable;
-    ```
-    
-    As the key type is a basic type it has specializations for ```std::hash``` and ```std::equal_to```; as both are default parameters, it is not necesary to specify the types for ```Hash``` and ```KeyEqual``` respectively
-
-2. Using the ```hash_table``` with a user defined type
-    
-    ```c++
-    hash_table<non_trivial_type, any_value_type> hashTable;
-    ```
-    
-    The ```STL``` do not have a template specialization for this user defined type; this is why the code below needs to be written.
-    
-    ```c++
-    // specialization for std::hash
-    template<>
-    std::hash<non_trivial_type> {
-        size_t operator() (const non_trivial_type& k) {
-            std::hash<basic_type> hash;
-            return hash(k.basic_type_member_variable);
-        }
-    }
-    ```
-    > A second option is to create a member function at ```non_trivial_type``` definition in order to return ```hash(k.string_format())``` instead of the ```hash``` applied to an especific member variable. For more information, visit [cppreference/hash](https://en.cppreference.com/w/cpp/utility/hash)
-   
-    ```c++
-    // specialization for std::equals_to
-    template<>
-    std::equals_to<non_trivial_type> {
-        bool operator(const non_trivial_type& a, const non_trivial_type& b) {
-            std::equals_to<comparable_type> equals;
-            return equals(a.comparable_member_variable, b.comparable_member_variable); // equivalent to a.x == b.x
-        }
-    }
-    ```
-    
-    >Note that if ```non_trivial_type``` have $k$ comparable member variables, depending of the implementation requirements, the function could need to verify if the $k$ values are equal in ```a``` and ```b```
-    
-    Once finished the template specialization the ```hash_table``` instance should work properly.
-
-## Third party hash functions (optional)
-In the examples shown above both ```KT``` has ```std::hash``` as hash function. As ```Hash``` is a type template parameter, it means that ```std::hash``` is not the unique hash function that can be used. For example, another hash function is ```SHA256```, popular by being one of the most secure hash algorithm used by some of the most secure networks in the world. ```OpenSSL``` is one of the third party libraries that provides this algorithm.
-
-To install OpenSSL in Fedora Linux 37
-```
+```zsh
 sudo yum install openssl
 sudo yum install openssl-devel
 ```
 
-To link the library with the project add the following lines to the ```CMakeList.txt``` file
+- [```Boost```](https://www.boost.org/): to store and operate
+  with [```256 bit integers```](https://stackoverflow.com/questions/2240973/how-long-is-the-sha256-hash#:~:text=Since%20sha256%20returns%20a%20hexadecimal,same%2C%20not%20varying%20at%20all.&text=i.e.%20a%20string%20with%2064%20characters.)
+
+```zsh
+sudo yum install boost-devel
+sudo yum install boost
+```
+
+To link the libraries with the project, add the following lines to ```CMakeList.txt```
+
 ```cmake
 find_package(OpenSSL REQUIRED)
-target_link_libraries(${PROJECT_NAME} OpenSSL::SSL)
+find_package(Boost REQUIRED)
+
+target_link_libraries(
+        ${PROJECT_NAME}
+        OpenSSL::SSL
+        Boost::boost
+)
 ```
 
-```SHA256``` algorithm would look like this:
+## Run the project
+
+```zsh
+git clone https://github.com/ByJuanDiego/hash-table.git
+cd hash-table
+cmake -B<build-dir-name> -H.
+cmake --build <build-dir-name> --target all
+./<build-dir-name>/hash_table
+```
+
+replace ```<build-dir-name>``` with the desire build directory name
+
+## Macros
+
 ```c++
-#include <openssl/sha.h>
-#include <functional>
-#include <iomanip>
-#include <string>
-
-std::string sha256(const std::string &str) {
-    unsigned char hash[SHA256_DIGEST_LENGTH];
-    SHA256_CTX sha256;
-    SHA256_Init(&sha256);
-    SHA256_Update(&sha256, str.c_str(), str.size());
-    SHA256_Final(hash, &sha256);
-    std::stringstream ss;
-    for (unsigned char i: hash) {
-        ss << std::hex << std::setw(2) << std::setfill('0') << (int) i;
-    }
-    return ss.str();
-}
+#define MINIMUM_REHASHING_FACTOR 2
+#define DEFAULT_N_BUCKETS 10
+#define DEFAULT_MAX_LOAD_FACTOR 0.75f
 ```
 
-> As we can see, ```sha256``` function can only recieve a ```std::string``` and return another ```std::string```, this will be important later.
-> Just for usage cases, lets reduce the return value to just take the first ```N``` digits
-> ```c++
-> #define SHA256_SIZE 10
-> return ss.str().substr(0, SHA256_SIZE);
-> ```
+## Constraints
 
-And this is the hash function structure to be used in the instantiation
 ```c++
-template<typename KT>
-struct hash_sha256 {
-    size_t operator()(const KT &key) {
-        KT hex_hash = sha256(key);
-        return std::stoull(hex_hash, nullptr, 16);
-    }
-};
-```
-If ```KT``` is not an ```std::string```, is required a template specialization for ```key_type``` in order to guarantee that ```sha256``` is recieving a ```std::string```. A usage example for a ```non_string_type``` is:
-```c++
-template<>
-struct hash_sha256<non_string_type> {
-    size_t operator()(const non_string_type &key) {
-        hash_sha256<std::string> hash;
-        return hash(key.string_format());
-    }
-};
+template<int RehashingFactor>
+concept RehashingFactorConstraint = RehashingFactor >= MINIMUM_REHASHING_FACTOR;
 ```
 
-Finally, all the ingredients are ready to create a new ```hash_table```:
+```RehashingFactorConstraint```: Makes sure that $RehashingFactor >= 2$
+
+## Template parameters
+
 ```c++
-hash_table<key_type, any_value_type, hash_sha256<key_type>> hashTable;
+template<
+        typename K,
+        typename V,
+        typename Hash = std::hash<K>,
+        typename Index = std::function<K(V)>,
+        typename Equal = std::equal_to<K>,
+        int RehashingFactor = MINIMUM_REHASHING_FACTOR
+> requires RehashingFactorConstraint<RehashingFactor>
+class hash_table
 ```
-do not forget to define ```std::equal<key_type>``` if needed, independant of the hash function
+
+- ```K```: defines the ```key``` type to access ```values```
+- ```V```: defines the type of the information (```values```) to be storage
+- ```Hash```: function type used to obtain a ```hash_code``` from a determined ```key```
+- ```Index```: function type used to obtain the index of a ```value```
+- ```Equal```: function type used to define when two ```keys``` are equal
+- ```RehashingFactor```: ```integer``` that defines
+  the ```table size multiplier``` when [```rehashing```](https://www.codingninjas.com/codestudio/library/load-factor-and-rehashing) occurs
+
+## Member variables
+
+```c++
+int k;
+int v;
+int b;
+Hash hash;
+Index index;
+Equal equal;
+float max_load_factor;
+std::list<entry> *buckets;
+```
+
+- ```k```: total number of ```keys```
+- ```v```: total number of ```values```, ```v``` $\geq$ ```k```
+- ```b```: total number of ```buckets```
+- ```hash```: function that recieves a ```key``` and generates a ```hash_code```
+- ```index```: function that recieves a ```value``` and returns his correspondant ```key```
+- ```equal```: function thar recieves two ```keys``` and returns ```true``` if are equal and ```false``` otherwise
+- ```max_load_factor```: fill threshold; when exeeded, ```rehashing``` occurs
+- ```buckets```: pointer to the ```array``` where ```entry lists``` are located
+
+## Member functions
+
+$n :=$ **total** number of ```records``` in the ```hash table```
+
+$e_{avg} :=$ **average** number of ```entries``` in a ```bucket```
+
+$v_{avg} :=$ **average** number of ```values``` on an ```entry```
+
+$f :=$ **time complexity** of the ```hash``` function
+
+|                             Member Function                             |    Return Type     |                                            Description                                             | Worst case complexity (Big $\mathcal{O}$) | Average case complexity (Big $\Theta$) |                                                              Notes                                                              |
+|:-----------------------------------------------------------------------:|:------------------:|:--------------------------------------------------------------------------------------------------:|:-----------------------------------------:|:--------------------------------------:|:-------------------------------------------------------------------------------------------------------------------------------:|
+|                          ```bucket_count()```                           |     ```int```      |                                       returns ```this->b```                                        |             $\mathcal{O}(1)$              |         same as $\mathcal{O}$          |                                                                -                                                                |
+|                        ```bucket_size(int i)```                         |     ```int```      |                      returns the number of ```entries``` at ```buckets[i]```                       |             $\mathcal{O}(1)$              |         same as $\mathcal{O}$          |      if ```i``` $\geq$ ```b``` throws an [```std::runtime_error```](https://en.cppreference.com/w/cpp/error/runtime_error)      |
+|                            ```key_count()```                            |     ```int```      |                                       returns ```this->k```                                        |             $\mathcal{O}(1)$              |         same as $\mathcal{O}$          |                                                                -                                                                |
+|                              ```size()```                               |     ```int```      |                                       returns ```this->v```                                        |             $\mathcal{O}(1)$              |         same as $\mathcal{O}$          |                                                                -                                                                |
+|                          ```empty(V value)```                           |     ```bool```     |               returns ```true``` if the hash table is empty, ```false``` otherwhise                |             $\mathcal{O}(1)$              |         same as $\mathcal{O}$          |                                                                -                                                                |
+|                              ```clear()```                              |     ```void```     |                   frees up the memory and allows to continue using the hashtable                   |             $\mathcal{O}(n)$              |         same as $\mathcal{O}$          |                                       if ```V``` is a pointer, records will not be freed                                        |
+|                            ```find(K key)```                            |     ```bool```     |          returns ```true``` if the ```key``` is on the hash table, ```false``` otherwise           |           $\mathcal{O}(f + n)$            |         $\Theta(f + e_{avg})$          |                                                     keeps the array length                                                      |
+|                          ```insert(V value)```                          |     ```void```     |            inserts a new ```value``` and creates an ```entry``` if ```key``` not exists            |           $\mathcal{O}(f + n)$            |         $\Theta(f + e_{avg})$          |                           when a certain number of ```entries``` are created, ```rehashing``` occurs                            |
+|                           ```remove(K key)```                           |     ```bool```     |       removes the ```entry``` that contains all the ```values``` which key equals ```key```        |           $\mathcal{O}(f + n)$            |    $\Theta(f + e_{avg} + v_{avg})$     |                                           returns ```false``` if ```key``` not exists                                           |
+|                           ```search(K key)```                           | ```std::list<V>``` | returns an ```std::list``` with all the ```values``` at the ```entry``` where key equals ```key``` |           $\mathcal{O}(f + n)$            |    $\Theta(f + e_{avg} + v_{avg})$     |                                      returns empty ```std::list``` if ```key``` not exists                                      |
+| ```print(std::ostream &os, Function<V> print_v, Function<K> print_k)``` |     ```void```     |                                     display all the hash table                                     |             $\mathcal{O}(n)$              |         same as $\mathcal{O}$          | ```print_v``` and ```print_k``` has default functions for [fundamental types](https://en.cppreference.com/w/cpp/language/types) |
+
+## Usage cases
+
