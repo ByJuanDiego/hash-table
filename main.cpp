@@ -27,10 +27,14 @@ struct transaction {
 };
 
 int main() {
-    hash_table<int, transaction *, sha2::sha256<int>, std::function<int(transaction *)>> hashTable(
-            [&](const transaction *tx) -> int {
-                return tx->amount;
-            });
+    sha2::sha256<std::string> hash;
+    std::function<std::string(transaction *)> index = [&](const transaction *tx) -> std::string {
+        return tx->emisor;
+    };
+    std::function<bool(std::string, std::string)> equal = [&](const std::string& a, const std::string& b) -> bool {
+        return (a == b);
+    };
+    hash_table<std::string, transaction *, decltype(hash), decltype(index), decltype(equal)> hashTable(index, hash, equal);
 
     std::ifstream file("transactions.txt");
     std::string emisor, receptor;
@@ -46,7 +50,7 @@ int main() {
     hashTable.print(std::cout, [&](std::ostream &os, const transaction *tx) { os << *tx; });
     std::cout << std::endl;
 
-    int key = 70311;
+    std::string key = "juan-diego";
     if (hashTable.find(key)) {
         std::cout << "key found:" << std::endl;
         for (const transaction *t: hashTable.search(key)) {

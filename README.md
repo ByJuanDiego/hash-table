@@ -52,7 +52,7 @@ replace ```<build-dir-name>``` with the desire build directory name
 
 ```c++
 #define MINIMUM_REHASHING_FACTOR 2
-#define DEFAULT_N_BUCKETS 10
+#define DEFAULT_N_BUCKETS 11
 #define DEFAULT_MAX_LOAD_FACTOR 0.75f
 ```
 
@@ -131,8 +131,47 @@ $v_{avg} :=$ **average** number of ```values``` on an ```entry```
 |                           ```search(K key)```                           | ```std::list<V>``` | returns an ```std::list``` with all the ```values``` at the ```entry``` where key equals ```key``` | $\Theta(e_{avg} + v_{avg})$ |                                         returns empty ```std::list``` if ```key``` not exists                                         |
 | ```print(std::ostream &os, Print<V> print_value, Print<K> print_key)``` |     ```void```     |                                     display all the hash table                                     |      $\mathcal{O}(n)$       | ```print_value``` and ```print_key``` has default functions for [fundamental types](https://en.cppreference.com/w/cpp/language/types) |
 
-## Usage cases
+# Usage cases
+
+## Initialization
 
 ```c++
-// todo
+sha2::sha256<std::string> hash;
+
+std::function<std::string(transaction *)> index = [&](const transaction *tx) -> std::string {
+    return tx->emisor;
+};
+
+std::function<bool(std::string, std::string)> equal = [&](const std::string& a, const std::string& b) -> bool {
+    return (a == b);
+};
+
+hash_table<std::string, transaction *, decltype(hash), decltype(index), decltype(equal)> hashTable(index, hash, equal);
 ```
+Instantiates a ```hashTable``` that contains ```transaction *``` indexed by ```emisor```
+
+- ```equal``` is an optional parameter. By default, it receives an instance of ```std::equal_to```, which works properly for built-in types. Using a non-built-int type as ```key``` makes necessary ```equal``` parameter or an [```std::equal_to``` specialization](https://en.cppreference.com/w/cpp/utility/functional/equal_to)
+- ```hash``` it receives an instance of ```sha2::sha256```, which is well-defined for [```std::to_string``` convertable](https://en.cppreference.com/w/cpp/string/basic_string/to_string) key-types and specialized for ```std::string``` usage. To use other key-types a ```sha2::sha256``` specialization is required 
+
+## Querying
+```c++
+std::string key = "juan-diego";
+for (const transaction *t: hashTable.search(key)) {
+    std::cout << t->to_string() << std::endl;
+}
+```
+
+This query returns all the```transactions``` made by ```juan-diego```
+
+## Freeing memory
+If the ```value-type``` is a pointer, the pointed values will not be freed when ```hash_table::~hash_table```  is called. This is manual process.
+```c++
+for (transaction *tx: txs_destructor) {
+    delete tx;
+}
+```
+
+
+# To be implemented
+
+- ```iterator``` class for the hash table
