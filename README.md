@@ -1,6 +1,6 @@
 # Hash table C++ implementation
 
-![](./images/hashtable.png)
+<img height="500" src="./images/hashtable.png" width="500"/>
 
 ## Requirements
 
