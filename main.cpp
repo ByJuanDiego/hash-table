@@ -27,11 +27,10 @@ struct transaction {
 };
 
 int main() {
-    hash_table<int, transaction *, sha2::sha256<int>, std::function<int(
-            const transaction *)>, std::equal_to<>, 2> hashTable(
+    hash_table<int, transaction *, sha2::sha256<int>, std::function<int(transaction *)>> hashTable(
             [&](const transaction *tx) -> int {
                 return tx->amount;
-            }, sha2::sha256<int>{}, std::equal_to<>{}, 10, 0.6);
+            });
 
     std::ifstream file("transactions.txt");
     std::string emisor, receptor;
@@ -62,7 +61,7 @@ int main() {
     }
 
     hashTable.clear();
-    for (transaction* tx : txs_destructor) {
+    for (transaction *tx: txs_destructor) {
         delete tx;
     }
     return 0;

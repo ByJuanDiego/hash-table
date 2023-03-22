@@ -24,7 +24,7 @@ using uint256 = boost::multiprecision::uint256_t;
 #endif
 
 #ifndef DEFAULT_N_BUCKETS
-#define DEFAULT_N_BUCKETS 10
+#define DEFAULT_N_BUCKETS 11
 #endif
 
 #ifndef DEFAULT_MAX_LOAD_FACTOR
@@ -32,10 +32,10 @@ using uint256 = boost::multiprecision::uint256_t;
 #endif
 
 template<typename Printable>
-using Function = std::function<void(std::ostream &, Printable)>;
+using Print = std::function<void(std::ostream &, Printable)>;
 
 template<typename Printable>
-Function<Printable> display = [](std::ostream &os, const Printable &p) { os << p; };
+Print<Printable> print = [](std::ostream &os, const Printable &p) { os << p; };
 
 template<int RehashingFactor>
 concept RehashingFactorConstraint = RehashingFactor >= MINIMUM_REHASHING_FACTOR;
@@ -109,7 +109,7 @@ public:
 
     std::list<V> search(K key);
 
-    void print(std::ostream &os, Function<V> print_v = display<V>, Function<K> print_k = display<K>);
+    void print(std::ostream &os, Print<V> print_value = ::print<V>, Print<K> print_key = ::print<K>);
 
 };
 

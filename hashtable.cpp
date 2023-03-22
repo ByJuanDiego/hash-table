@@ -109,8 +109,8 @@ int hash_table<K, V, Hash, Index, Equal, RehashingFactor>::bucket_size(int i) {
 }
 
 template<typename K, typename V, typename Hash, typename Index, typename Equal, int RehashingFactor>
-requires RehashingFactorConstraint<RehashingFactor>int
-hash_table<K, V, Hash, Index, Equal, RehashingFactor>::bucket_count() {
+requires RehashingFactorConstraint<RehashingFactor>
+int hash_table<K, V, Hash, Index, Equal, RehashingFactor>::bucket_count() {
     return this->b;
 }
 
@@ -137,8 +137,8 @@ hash_table<K, V, Hash, Index, Equal, RehashingFactor>::hash_table(
 }
 
 template<typename K, typename V, typename Hash, typename Index, typename Equal, int RehashingFactor>
-requires RehashingFactorConstraint<RehashingFactor>float
-hash_table<K, V, Hash, Index, Equal, RehashingFactor>::load_factor() {
+requires RehashingFactorConstraint<RehashingFactor>
+float hash_table<K, V, Hash, Index, Equal, RehashingFactor>::load_factor() {
     return key_count() * 1.0 / bucket_count();
 }
 
@@ -173,23 +173,21 @@ void hash_table<K, V, Hash, Index, Equal, RehashingFactor>::rehashing() {
 }
 
 template<typename K, typename V, typename Hash, typename Index, typename Equal, int RehashingFactor>
-requires RehashingFactorConstraint<RehashingFactor>void
-hash_table<K, V, Hash, Index, Equal, RehashingFactor>::print(
-        std::ostream &os, Function<V> print_v, Function<K> print_k
-) {
+requires RehashingFactorConstraint<RehashingFactor>
+void hash_table<K, V, Hash, Index, Equal, RehashingFactor>::print(std::ostream &os, Print<V> print_value,
+                                                                  Print<K> print_key) {
     for (int i = 0; i < bucket_count(); ++i) {
         os << "[" << i << "]";
         for (const entry &e: buckets[i]) {
             os << " ==> [";
-            print_k(os, e.key);
+            print_key(os, e.key);
             os << ":(";
             for (auto it = e.values.begin(); it != e.values.end(); ++it) {
-                print_v(os, *it);
+                print_value(os, *it);
                 os << ((std::next(it, 1) != e.values.end()) ? "," : "");
             }
             os << ")]";
         }
         os << std::endl;
     }
-
 }
