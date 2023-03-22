@@ -4,7 +4,7 @@
 
 ## Requirements
 
-To run the project, install the following libraries:
+Before running the project, install the following libraries:
 
 - [```OpenSSL```](https://www.openssl.org/): to generate [```sha256```](https://en.wikipedia.org/wiki/SHA-2)
 
@@ -61,7 +61,7 @@ template<int RehashingFactor>
 concept RehashingFactorConstraint = RehashingFactor >= MINIMUM_REHASHING_FACTOR;
 ```
 
-```RehashingFactorConstraint```: Makes sure that $RehashingFactor >= 2$
+```RehashingFactorConstraint```: Makes sure that ```RehashingFactor``` $\geq 2$
 
 ## Template parameters
 
@@ -133,3 +133,6 @@ $f :=$ **time complexity** of the ```hash``` function
 
 ## Usage cases
 
+```c++
+// todo
+```
