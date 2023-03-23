@@ -7,7 +7,7 @@ configure_file(assets/transactions.txt ${CMAKE_CURRENT_BINARY_DIR} COPYONLY)
 find_package(OpenSSL REQUIRED)
 find_package(Boost REQUIRED)
 
-add_executable(hash_table main.cpp include/hashtable.hpp utils/hashfunctions.hpp)
+add_executable(hash_table main.cpp include/hashtable.hpp include/hashfunction.hpp src/hashtable.cpp src/hashfunction.cpp indexable/include/transaction.hpp indexable/src/transaction.cpp)
 
 target_link_libraries(
         ${PROJECT_NAME}

@@ -1,30 +1,9 @@
 #include <iostream>
 #include <fstream>
 
-#include "utils/hashfunctions.hpp"
-#include "include/hashtable.hpp"
-
-struct transaction {
-    std::string emisor;
-    std::string receptor;
-    int amount;
-
-    explicit transaction(std::string emisor, std::string receptor, int amount) :
-            emisor(std::move(emisor)), receptor(std::move(receptor)), amount(amount) {}
-
-    ~transaction() = default;
-
-    [[nodiscard]] std::string to_string() const {
-        std::stringstream ss;
-        ss << *this;
-        return ss.str();
-    }
-
-    friend std::ostream &operator<<(std::ostream &os, const transaction &transaction) {
-        os << "{" << transaction.emisor << "," << transaction.receptor << "," << transaction.amount << "}";
-        return os;
-    }
-};
+#include "indexable/include/transaction.hpp"
+#include "include/hashfunction.hpp"
+#include "src/hashtable.cpp"
 
 int main() {
     sha2::sha256<std::string> hash;
