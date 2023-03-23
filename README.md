@@ -41,12 +41,9 @@ target_link_libraries(
 ```zsh
 git clone https://github.com/ByJuanDiego/hash-table.git
 cd hash-table
-cmake -B<build-dir-name> -H.
-cmake --build <build-dir-name> --target all
-./<build-dir-name>/hash_table
+chmod +x run.zsh
+./run.zsh
 ```
-
-replace ```<build-dir-name>``` with the desire build directory name
 
 ## Member functions
 

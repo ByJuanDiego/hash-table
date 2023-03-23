@@ -15,7 +15,7 @@ int main() {
     };
     hash_table<std::string, transaction *, decltype(hash), decltype(index), decltype(equal)> hashTable(index, hash, equal);
 
-    std::ifstream file("transactions.txt");
+    std::ifstream file("./assets/transactions.txt");
     std::string emisor, receptor;
     int amount;
     std::list<transaction *> destructor;
