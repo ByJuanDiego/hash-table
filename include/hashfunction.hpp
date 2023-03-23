@@ -18,39 +18,28 @@
 
 using uint256 = boost::multiprecision::uint256_t;
 
-/**
- * @namespace to group functions and structures related to hashing
- */
-namespace sha2
-{
-    /**
-     * transform a 64 length hexadecimal to a 256 bit unsigned integer
-     *
-     *
-     * @param hex contains the hexadecimal
-     */
+
+/// Group of functions and callbacks related to hashing
+namespace sha2 {
+
+    /// Transform a hexadecimal to a 256 bits integer
     uint256 to_uint256(const std::string &hex);
 
-    /**
-     * hashes a string of any length and gets his correspondant sha256 value
-     *
-     *
-     * @param str contains the string
-     * @return sha256(str) in hexadecimal format
-     */
+    /// Transform a string to his correspondent sha256 hash code
     std::string get_sha256(const std::string &str);
 
     /**
-     * template struct used as functor to get hashes
+     * Callback struct used to get sha256 from a key.
      *
      *
-     * @tparam K: type of the to be hashed
+     * @tparam K the type of the key to be hashed
      */
     template<typename K>
     struct sha256 {
         uint256 operator()(const K &key);
     };
 
+    /// sha256<K> specialization for strings
     template<>
     struct sha256<std::string> {
         uint256 operator()(const std::string &key);
