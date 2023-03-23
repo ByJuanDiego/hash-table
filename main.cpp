@@ -1,7 +1,7 @@
 #include <iostream>
 #include <fstream>
 
-#include "indexes/include/transaction.hpp"
+#include "utils/include/transaction.hpp"
 #include "include/hashfunction.hpp"
 #include "src/hashtable.cpp"
 
@@ -15,7 +15,7 @@ int main() {
     };
     hash_table<std::string, transaction *, decltype(hash), decltype(index), decltype(equal)> hashTable(index, hash, equal);
 
-    std::ifstream file("./assets/transactions.txt");
+    std::ifstream file("./utils/assets/transactions.txt");
     std::string emisor, receptor;
     int amount;
     std::list<transaction *> destructor;
