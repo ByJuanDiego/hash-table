@@ -92,7 +92,7 @@ hash_table<string, transaction *, sha, index_t, equal_t> hashTable(index, hash, 
 
 Instantiates a ```hashTable``` that contains ```transaction *``` indexed by ```emisor```
 
-- ```equal``` is an optional parameter. By default, it receives an instance of ```std::equal_to```, which works properly for built-in types. Using a non-built-int type as ```key``` makes necessary ```equal``` parameter or an [```std::equal_to``` specialization](https://en.cppreference.com/w/cpp/utility/functional/equal_to)
+- ```equal``` is an optional parameter. By default, it receives an instance of ```std::equal_to```, which works properly for built-in types. Using a non-built-in type as ```key``` makes necessary ```equal``` parameter or an [```std::equal_to``` specialization](https://en.cppreference.com/w/cpp/utility/functional/equal_to)
 - ```hash``` is an instance of ```sha2::sha256```, which is well-defined for [```std::to_string``` convertable](https://en.cppreference.com/w/cpp/string/basic_string/to_string) key-types and specialized for ```std::string``` usage. To use other key-types a ```sha2::sha256``` specialization is required 
 - usage of other hash functions such as [```std::hash```](https://en.cppreference.com/w/cpp/utility/hash) is allowed by passing the desire hash function as template type parameter
 
@@ -104,7 +104,7 @@ for (const transaction *t: hashTable.search(key)) {
 }
 ```
 
-This query returns all the```transactions``` made by ```juan-diego```
+This query returns all the ```transactions``` made by ```juan-diego```
 
 ## Freeing memory
 If the ```value-type``` is a pointer, the pointed values will not be freed when ```hash_table::~hash_table```  is called. This is manual process.
