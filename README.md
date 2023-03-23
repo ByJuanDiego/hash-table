@@ -59,7 +59,7 @@ $v_{avg} :=$ **average** number of ```values``` on an ```entry```
 |                             Member Function                             | Big $\mathcal{O}$ performance |  Big $\Theta$ performance   |                                                                 Notes                                                                 |
 |:-----------------------------------------------------------------------:|:-----------------------------:|:---------------------------:|:-------------------------------------------------------------------------------------------------------------------------------------:|
 |                          ```bucket_count()```                           |       $\mathcal{O}(1)$        |    Same as $\mathcal{O}$    |                                                                   -                                                                   |
-|                        ```bucket_size(int i)```                         |       $\mathcal{O}(1)$        |    Same as $\mathcal{O}$    |                                                                                                                                       |
+|                        ```bucket_size(int i)```                         |       $\mathcal{O}(1)$        |    Same as $\mathcal{O}$    |                                                                   -                                                                   |
 |                            ```key_count()```                            |       $\mathcal{O}(1)$        |    Same as $\mathcal{O}$    |                                                                   -                                                                   |
 |                              ```size()```                               |       $\mathcal{O}(1)$        |    Same as $\mathcal{O}$    |                                                                   -                                                                   |
 |                              ```empty()```                              |       $\mathcal{O}(1)$        |    Same as $\mathcal{O}$    |                                                                   -                                                                   |
@@ -67,7 +67,7 @@ $v_{avg} :=$ **average** number of ```values``` on an ```entry```
 |                            ```find(K key)```                            |       $\mathcal{O}(n)$        |      $\Theta(e_{avg})$      |                                                        keeps the array length                                                         |
 |                          ```insert(V value)```                          |       $\mathcal{O}(n)$        |      $\Theta(e_{avg})$      |                                                                   -                                                                   |
 |                           ```remove(K key)```                           |       $\mathcal{O}(n)$        | $\Theta(e_{avg} + v_{avg})$ |                                                                   -                                                                   |
-|                           ```search(K key)```                           |       $\mathcal{O}(n)$        | $\Theta(e_{avg} + v_{avg})$ |                                         returns empty ```std::list``` if ```key``` not exists                                         |
+|                           ```search(K key)```                           |       $\mathcal{O}(n)$        | $\Theta(e_{avg} + v_{avg})$ |                                                                   -                                                                   |
 | ```print(std::ostream &os, Print<V> print_value, Print<K> print_key)``` |       $\mathcal{O}(n)$        |    Same as $\mathcal{O}$    | ```print_value``` and ```print_key``` has default functions for [fundamental types](https://en.cppreference.com/w/cpp/language/types) |
 
 # Usage cases
@@ -109,7 +109,7 @@ This query returns all the ```transactions``` made by ```juan-diego```
 ## Freeing memory
 If the ```value-type``` is a pointer, the pointed values will not be freed when ```hash_table::~hash_table```  is called. This is manual process.
 ```c++
-for (transaction *tx: txs_destructor) {
+for (transaction *tx: destructor) {
     delete tx;
 }
 ```

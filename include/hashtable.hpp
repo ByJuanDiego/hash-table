@@ -43,13 +43,13 @@ template<uint8 N>
 concept Constraint = (N >= MINIMUM_REHASHING_FACTOR && N <= MAXIMUM_REHASHING_FACTOR);
 
 /**
- * Hash indexes for queries.
+ * Hash index for queries.
  *
  *
  * @tparam K the type of the key
  * @tparam V the type of data stored in the hash table
  * @tparam Hash callable used to obtain a hash code from a determined key
- * @tparam Index callable used to obtain the indexes of a value
+ * @tparam Index callable used to obtain the index of a value
  * @tparam Equal callable used to define when two keys are equal
  * @tparam RehashingFactor 8-bits integer that defines the table size multiplier when rehashing ocurrs
  */
@@ -87,7 +87,7 @@ private:
     int v;                         ///< Total number of values
     int b;                         ///< Total number of buckets
     Hash hash;                     ///< Receives a key and generates his hash code
-    Index index;                   ///< Receives a key and generates his hash code
+    Index index;                   ///< Receives a value and returns his index attribute
     Equal equal;                   ///< Receives two keys and returns true if both are equal and false otherwise
     float max_load_factor;         ///< Fill threshold; when exeeded, rehashing occurs
     std::list<entry> *buckets;     ///< Pointer to the array where entry lists are located
@@ -119,7 +119,7 @@ public:
     /**
      * Returns the number of entries in a bucket
      *
-     * @param i the indexes of the array to be accessed
+     * @param i the index of the array to be accessed
      * @throws std::rutime_error if `i` is greater or equal to `b`
      */
     int bucket_size(int i);
@@ -161,8 +161,8 @@ public:
      * Search all the values associated to a key
      *
      *
-     * @param key the key to be deleted
-     * @return a list with all the values which key are equal to `key`
+     * @param key the key to be searched
+     * @return a list with all the values whose keys are equal to `key`. Returns empty list if the `key` not exists.
      */
     std::list<V> search(K key);
 

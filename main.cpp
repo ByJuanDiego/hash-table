@@ -1,7 +1,7 @@
 #include <iostream>
 #include <fstream>
 
-#include "indexable/include/transaction.hpp"
+#include "indexes/include/transaction.hpp"
 #include "include/hashfunction.hpp"
 #include "src/hashtable.cpp"
 
@@ -18,12 +18,12 @@ int main() {
     std::ifstream file("transactions.txt");
     std::string emisor, receptor;
     int amount;
-    std::list<transaction *> txs_destructor;
+    std::list<transaction *> destructor;
 
     while (file >> emisor >> receptor >> amount) {
         auto *tx = new transaction(emisor, receptor, amount);
         hashTable.insert(tx);
-        txs_destructor.push_back(tx);
+        destructor.push_back(tx);
     }
 
     hashTable.print(std::cout, [&](std::ostream &os, const transaction *tx) { os << *tx; });
@@ -44,7 +44,7 @@ int main() {
     }
 
     hashTable.clear();
-    for (transaction *tx: txs_destructor) {
+    for (transaction *tx: destructor) {
         delete tx;
     }
     return 0;
