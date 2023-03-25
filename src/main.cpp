@@ -10,7 +10,7 @@ int main() {
     std::function<std::string(transaction *)> index = [&](const transaction *tx) -> std::string {
         return tx->emisor;
     };
-    std::function<bool(std::string, std::string)> equal = [&](const std::string& a, const std::string& b) -> bool {
+    std::function<bool(std::string, std::string)> equal = [&](const std::string &a, const std::string &b) -> bool {
         return (a == b);
     };
     hash_table<std::string, transaction *, decltype(hash), decltype(index), decltype(equal)> hashTable(index, hash, equal);
