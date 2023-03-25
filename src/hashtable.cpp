@@ -2,7 +2,7 @@
 // Created by juandiego on 3/22/23.
 //
 
-#include "../include/hashtable.hpp"
+#include "hashtable.hpp"
 
 //-----------------------------------------------------------------------------
 

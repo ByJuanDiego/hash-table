@@ -1,9 +1,9 @@
 #include <iostream>
 #include <fstream>
 
-#include "utils/include/transaction.hpp"
-#include "include/hashfunction.hpp"
-#include "src/hashtable.cpp"
+#include "transaction.hpp"
+#include "hashfunction.hpp"
+#include "hashtable.cpp"
 
 int main() {
     sha2::sha256<std::string> hash;
