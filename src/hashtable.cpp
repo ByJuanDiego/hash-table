@@ -84,8 +84,8 @@ int hash_table<K, V, Hash, Index, Equal, RehashingFactor>::bucket_count() {
 //-----------------------------------------------------------------------------
 
 template<typename K, typename V, typename Hash, typename Index, typename Equal, uint8 RehashingFactor>
-requires Constraint<RehashingFactor>int
-hash_table<K, V, Hash, Index, Equal, RehashingFactor>::key_count() {
+requires Constraint<RehashingFactor>
+int hash_table<K, V, Hash, Index, Equal, RehashingFactor>::key_count() {
     return this->k;
 }
 
@@ -103,14 +103,16 @@ int hash_table<K, V, Hash, Index, Equal, RehashingFactor>::bucket_size(int i) {
 //-----------------------------------------------------------------------------
 
 template<typename K, typename V, typename Hash, typename Index, typename Equal, uint8 RehashingFactor>
-requires Constraint<RehashingFactor>int hash_table<K, V, Hash, Index, Equal, RehashingFactor>::size() {
+requires Constraint<RehashingFactor>
+int hash_table<K, V, Hash, Index, Equal, RehashingFactor>::size() {
     return this->v;
 }
 
 //-----------------------------------------------------------------------------
 
 template<typename K, typename V, typename Hash, typename Index, typename Equal, uint8 RehashingFactor>
-requires Constraint<RehashingFactor>bool hash_table<K, V, Hash, Index, Equal, RehashingFactor>::empty() {
+requires Constraint<RehashingFactor>
+bool hash_table<K, V, Hash, Index, Equal, RehashingFactor>::empty() {
     return key_count() == 0;
 }
 
@@ -193,8 +195,8 @@ bool hash_table<K, V, Hash, Index, Equal, RehashingFactor>::remove(K key) {
 //-----------------------------------------------------------------------------
 
 template<typename K, typename V, typename Hash, typename Index, typename Equal, uint8 RehashingFactor>
-requires Constraint<RehashingFactor>std::list<V>
-hash_table<K, V, Hash, Index, Equal, RehashingFactor>::search(K key) {
+requires Constraint<RehashingFactor>
+std::list<V> hash_table<K, V, Hash, Index, Equal, RehashingFactor>::search(K key) {
     uint256 hash_code = hash(key);
     int i = (int) (hash_code % b);
     std::list<entry> &bucket = buckets[i];
